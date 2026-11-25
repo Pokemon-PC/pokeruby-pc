@@ -316,7 +316,7 @@ void (*const gEscapeRopeFieldEffectFuncs[])(struct Task *) = {
 
 static u8 sActiveList[32];
 
-extern u8 *gFieldEffectScriptPointers[];
+extern u8 *PC_PTR32 gFieldEffectScriptPointers[];
 
 u32 FieldEffectStart(u8 id)
 {

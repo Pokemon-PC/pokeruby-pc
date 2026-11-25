@@ -66,9 +66,9 @@ extern u16 gSpecialVar_Result;
 
 extern u16 gSpecialVar_ContestCategory;
 
-extern SpecialFunc gSpecials[];
-extern u8 *gStdScripts[];
-extern u8 *gStdScripts_End[];
+extern SpecialFunc PC_PTR32 gSpecials[];
+extern u8 *PC_PTR32 gStdScripts[];
+extern u8 *PC_PTR32 gStdScripts_End[];
 
 // This is defined in here so the optimizer can't see its value when compiling
 // script.c.
@@ -120,7 +120,11 @@ bool8 ScrCmd_special(struct ScriptContext *ctx)
 {
     u16 index = ScriptReadHalfword(ctx);
 
+#ifdef PLATFORM_PC
+    ((SpecialFunc)gSpecials[index])(); // no call through a 32-bit pointer
+#else
     gSpecials[index]();
+#endif
     return FALSE;
 }
 
@@ -128,7 +132,11 @@ bool8 ScrCmd_specialvar(struct ScriptContext *ctx)
 {
     u16 *var = GetVarPointer(ScriptReadHalfword(ctx));
 
+#ifdef PLATFORM_PC
+    *var = ((SpecialFunc)gSpecials[ScriptReadHalfword(ctx)])();
+#else
     *var = gSpecials[ScriptReadHalfword(ctx)]();
+#endif
     return FALSE;
 }
 
@@ -236,7 +244,7 @@ bool8 ScrCmd_vcall_if(struct ScriptContext *ctx)
 bool8 ScrCmd_gotostd(struct ScriptContext *ctx)
 {
     u8 index = ScriptReadByte(ctx);
-    u8 **ptr = &gStdScripts[index];
+    u8 *PC_PTR32 *ptr = &gStdScripts[index];
 
     if (ptr < gStdScripts_End)
         ScriptJump(ctx, *ptr);
@@ -246,7 +254,7 @@ bool8 ScrCmd_gotostd(struct ScriptContext *ctx)
 bool8 ScrCmd_callstd(struct ScriptContext *ctx)
 {
     u8 index = ScriptReadByte(ctx);
-    u8 **ptr = &gStdScripts[index];
+    u8 *PC_PTR32 *ptr = &gStdScripts[index];
 
     if (ptr < gStdScripts_End)
         ScriptCall(ctx, *ptr);
@@ -260,7 +268,7 @@ bool8 ScrCmd_gotostd_if(struct ScriptContext *ctx)
 
     if (sScriptConditionTable[condition][ctx->comparisonResult] == 1)
     {
-        u8 **ptr = &gStdScripts[index];
+        u8 *PC_PTR32 *ptr = &gStdScripts[index];
         if (ptr < gStdScripts_End)
             ScriptJump(ctx, *ptr);
     }
@@ -274,7 +282,7 @@ bool8 ScrCmd_callstd_if(struct ScriptContext *ctx)
 
     if (sScriptConditionTable[condition][ctx->comparisonResult] == 1)
     {
-        u8 **ptr = &gStdScripts[index];
+        u8 *PC_PTR32 *ptr = &gStdScripts[index];
         if (ptr < gStdScripts_End)
             ScriptCall(ctx, *ptr);
     }

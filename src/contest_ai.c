@@ -8,7 +8,7 @@
 extern u16 gSpecialVar_ContestCategory;
 
 extern u8 *gAIScriptPtr;
-extern u8 *gContestAIs[];
+extern u8 *PC_PTR32 gContestAIs[];
 
 static void ContestAICmd_unk_00(void);
 static void ContestAICmd_get_turn(void);

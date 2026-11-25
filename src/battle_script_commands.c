@@ -97,7 +97,7 @@ extern const u8 BattleText_YesNo[];
 extern u8 gPlayerPartyCount;
 extern u16 gMoveToLearn; //move to learn
 
-struct TrainerReward
+struct PC_APCS TrainerReward
 {
     u8 trainerClass;
     u8 baseMoney;
@@ -105,7 +105,7 @@ struct TrainerReward
 
 extern const struct TrainerReward gTrainerMoney[];
 extern u16 gRandomMove;
-extern u8* gBattleScriptsForMoveEffects[];
+extern u8* PC_PTR32 gBattleScriptsForMoveEffects[];
 extern u16 gChosenMove; //last used move in battle
 extern u8 gBattlerInMenuId;
 extern u8 gActionForBanks[4];

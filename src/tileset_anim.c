@@ -522,7 +522,11 @@ static void StartTileset1Animation(void)
     {
         if (gMapHeader.mapLayout->primaryTileset->callback)
         {
+#ifdef PLATFORM_PC
+            ((TilesetCB)gMapHeader.mapLayout->primaryTileset->callback)(); // no call through a 32-bit pointer
+#else
             gMapHeader.mapLayout->primaryTileset->callback();
+#endif
         }
     }
 }
@@ -536,7 +540,11 @@ static void StartTileset2Animation(void)
     {
         if (gMapHeader.mapLayout->secondaryTileset->callback)
         {
+#ifdef PLATFORM_PC
+            ((TilesetCB)gMapHeader.mapLayout->secondaryTileset->callback)(); // no call through a 32-bit pointer
+#else
             gMapHeader.mapLayout->secondaryTileset->callback();
+#endif
         }
     }
 }

@@ -6,7 +6,7 @@
 
 struct ScanlineEffectParams;
 
-struct MonCoords
+struct PC_APCS MonCoords
 {
     // This would use a bitfield, but sub_8079F44
     // uses it as a u8 and casting won't match.

@@ -11,6 +11,54 @@
 
 	.align 2
 gUnknown_081F9674:: @ 81F9674
+#ifdef PLATFORM_PC
+@ 64-bit host (pp_s.py --wide widens .4byte, not .quad/.long): laid out as
+@ the C structs, struct ScanlineEffectParams and struct LinkResultWindow
+@ (battle_bg.c), with 8-byte pointers.
+	.quad REG_BG3HOFS
+	.long ((DMA_ENABLE | DMA_START_HBLANK | DMA_REPEAT | DMA_DEST_RELOAD) << 16) | 1
+	.byte 1, 0
+	.2byte 0
+
+	.p2align 3
+gUnknown_081F9680::
+	.quad gUnknown_030041D0
+	.2byte 0x20
+	.byte 0x13, 0x10
+	.long 0
+	.quad BG_VRAM + 0xE104
+
+	.quad gUnknown_03004250
+	.2byte 0x40
+	.byte 0x13, 0x10
+	.long 0
+	.quad BG_VRAM + 0xF104
+
+	.quad gUnknown_030041D0
+	.2byte 0x60
+	.byte 0x13, 0x30
+	.long 0
+	.quad BG_VRAM + 0xE204
+
+	.quad gUnknown_03004250
+	.2byte 0x80
+	.byte 0x13, 0x30
+	.long 0
+	.quad BG_VRAM + 0xF204
+
+	.quad gUnknown_030041D0
+	.2byte 0x20
+	.byte 0x13, 0x18
+	.long 0
+	.quad BG_VRAM + 0xE1C4
+
+	.quad gUnknown_03004250
+	.2byte 0x40
+	.byte 0x13, 0x18
+	.long 0
+	.quad BG_VRAM + 0xF1C4
+
+#else
 	.4byte REG_BG3HOFS
 	.4byte ((DMA_ENABLE | DMA_START_HBLANK | DMA_REPEAT | DMA_DEST_RELOAD) << 16) | 1
 	.4byte 1
@@ -53,6 +101,7 @@ gUnknown_081F9680:: @ 81F9680
 	.byte 0x18
 	.4byte BG_VRAM + 0xF1C4
 
+#endif
 gUnknown_081F96C8:: @ 81F96C8
 	.string "ヌケニン$" @ "Nukenin" (Shedinja)
 

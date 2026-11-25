@@ -6,11 +6,36 @@
 #define TRUE  1
 #define FALSE 0
 
+#ifdef PLATFORM_PC
+// Plain globals on PC: the build gathers all game variables in one
+// section, saved at startup and restored by a soft reset.
+#define BSS_DATA
+#define IWRAM_DATA
+#define EWRAM_DATA
+// Pointer field or table element kept 32-bit wide, as laid out by the
+// assembly data (.4byte); zero-extended when read. MinGW defines
+// __ptr32/__uptr as empty macros for GCC: undo that for Clang.
+#undef __ptr32
+#undef __uptr
+#define PC_PTR32 __ptr32 __uptr
+// The GBA compilers (agbcc, GCC -mabi=apcs-gnu) round every struct up to a
+// multiple of 4 bytes; the assembly data relies on it (e.g. 2-byte structs
+// laid out as 4). Clang on x86 does not: PC_APCS restores it where needed.
+#define PC_APCS __attribute__((aligned(4)))
+#else
+#define PC_PTR32
+#define PC_APCS
 #define BSS_DATA   __attribute__((section(".bss")))
 #define IWRAM_DATA __attribute__((section("iwram_data")))
 #define EWRAM_DATA __attribute__((section("ewram_data")))
+#endif
 #define UNUSED __attribute__((unused))
+#ifdef PLATFORM_PC
+// ARM assembly body, no C version: an error if the game uses it on PC.
+#define NAKED __attribute__((deprecated("ARM-only function: needs a C version on PC")))
+#else
 #define NAKED __attribute__((naked))
+#endif
 
 #define ALIGNED(n) __attribute__((aligned(n)))
 

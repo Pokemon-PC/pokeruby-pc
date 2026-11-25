@@ -24,8 +24,8 @@ static struct ScriptContext sGlobalScriptContext;
 static struct ScriptContext sImmediateScriptContext;
 static bool8 sLockFieldControls;
 
-extern ScrCmdFunc gScriptCmdTable[];
-extern ScrCmdFunc gScriptCmdTableEnd[];
+extern ScrCmdFunc PC_PTR32 gScriptCmdTable[];
+extern ScrCmdFunc PC_PTR32 gScriptCmdTableEnd[];
 extern void *const gNullScriptPtr;
 
 void InitScriptContext(struct ScriptContext *ctx, void *cmdTable, void *cmdTableEnd)
@@ -89,7 +89,7 @@ bool8 RunScriptCommand(struct ScriptContext *ctx)
         while (1)
         {
             u8 cmdCode;
-            ScrCmdFunc *func;
+            ScrCmdFunc PC_PTR32 *func;
 
             if (!ctx->scriptPtr)
             {
@@ -100,7 +100,11 @@ bool8 RunScriptCommand(struct ScriptContext *ctx)
             if (ctx->scriptPtr == gNullScriptPtr)
             {
                 while (1)
+#ifdef PLATFORM_PC
+                    pc_wait_vblank(); // HALT: wait for interrupts forever
+#else
                     asm("svc 2"); // HALT
+#endif
             }
 
             cmdCode = *(ctx->scriptPtr);
@@ -113,7 +117,11 @@ bool8 RunScriptCommand(struct ScriptContext *ctx)
                 return FALSE;
             }
 
+#ifdef PLATFORM_PC
+            if (((ScrCmdFunc)*func)(ctx) == TRUE) // no call through a 32-bit pointer
+#else
             if ((*func)(ctx) == TRUE)
+#endif
                 return TRUE;
         }
     }

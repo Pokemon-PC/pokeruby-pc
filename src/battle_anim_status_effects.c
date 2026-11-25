@@ -18,7 +18,7 @@ extern u8 gBattleAnimTarget;
 extern u8 gBattlerSpriteIds[];
 extern const struct CompressedSpriteSheet gBattleAnimPicTable[];
 extern const struct CompressedSpritePalette gBattleAnimPaletteTable[];
-extern const u8 *const gBattleAnims_StatusConditions[];
+extern const u8 *const PC_PTR32 gBattleAnims_StatusConditions[];
 extern const struct OamData gOamData_837E05C;
 extern const struct OamData gOamData_837DF24;
 

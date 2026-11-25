@@ -481,6 +481,51 @@ extern u8 *de_sub_8041024(s32, u32);
 #endif
 
 #ifdef ENGLISH
+#ifdef PLATFORM_PC
+// The French game (text from the player's French ROM, platform_pc/lang_pc.c)
+// puts " sauvage" / " ennemi" after the name - as the German branch below
+// does with its own words - instead of "Wild " / "Foe " before it.
+int pc_lang_is_french(void);
+#define HANDLE_NICKNAME_STRING_CASE(bank, monIndex)                     \
+    if (GetBattlerSide(bank) != 0 && pc_lang_is_french())               \
+    {                                                                   \
+        GetMonData(&gEnemyParty[monIndex], MON_DATA_NICKNAME, text);    \
+        StringGetEnd10(text);                                           \
+        toCpy = text;                                                   \
+        while (*toCpy != EOS)                                           \
+        {                                                               \
+            dst[dstID] = *toCpy;                                        \
+            dstID++;                                                    \
+            toCpy++;                                                    \
+        }                                                               \
+        if (gBattleTypeFlags & BATTLE_TYPE_TRAINER)                     \
+            toCpy = BattleText_Foe;                                  \
+        else                                                            \
+            toCpy = BattleText_Wild;                                  \
+    }                                                                   \
+    else if (GetBattlerSide(bank) != 0)                                 \
+    {                                                                   \
+        if (gBattleTypeFlags & BATTLE_TYPE_TRAINER)                     \
+            toCpy = BattleText_Foe;                                  \
+        else                                                            \
+            toCpy = BattleText_Wild;                                  \
+        while (*toCpy != EOS)                                           \
+        {                                                               \
+            dst[dstID] = *toCpy;                                        \
+            dstID++;                                                    \
+            toCpy++;                                                    \
+        }                                                               \
+        GetMonData(&gEnemyParty[monIndex], MON_DATA_NICKNAME, text);    \
+        StringGetEnd10(text);                                           \
+        toCpy = text;                                                   \
+    }                                                                   \
+    else                                                                \
+    {                                                                   \
+        GetMonData(&gPlayerParty[monIndex], MON_DATA_NICKNAME, text);   \
+        StringGetEnd10(text);                                           \
+        toCpy = text;                                                   \
+    }
+#else
 #define HANDLE_NICKNAME_STRING_CASE(bank, monIndex)                     \
     if (GetBattlerSide(bank) != 0)                                         \
     {                                                                   \
@@ -502,6 +547,7 @@ extern u8 *de_sub_8041024(s32, u32);
     }                                                                   \
     StringGetEnd10(text);                                               \
     toCpy = text;
+#endif // PLATFORM_PC
 #else
 #define HANDLE_NICKNAME_STRING_CASE(bank, monIndex)                     \
     if (GetBattlerSide(bank) != 0)                                         \

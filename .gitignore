@@ -48,3 +48,15 @@ build/
 porymap.*.cfg
 prefabs.json
 .porydaw/
+
+# PC port
+build-tools/
+build-pc/
+build-sapphire/
+save_*.bin
+save_*.rtc
+save.bin
+config.ini
+__pycache__/
+dist/
+/*.log

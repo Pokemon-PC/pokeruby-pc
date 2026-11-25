@@ -60,7 +60,7 @@ struct ToneData
     u8 key;
     u8 length; // sound length (compatible sound)
     u8 pan_sweep; // pan or sweep (compatible sound ch. 1)
-    struct WaveData *wav;
+    struct WaveData *PC_PTR32 wav;
     u8 attack;
     u8 decay;
     u8 sustain;
@@ -222,8 +222,8 @@ struct SongHeader
     u8 blockCount;
     u8 priority;
     u8 reverb;
-    struct ToneData *tone;
-    u8 *part[1];
+    struct ToneData *PC_PTR32 tone;
+    u8 *PC_PTR32 part[1];
 };
 
 struct PokemonCrySong
@@ -232,8 +232,8 @@ struct PokemonCrySong
     u8 blockCount;
     u8 priority;
     u8 reverb;
-    struct ToneData *tone;
-    u8 *part[2];
+    struct ToneData *PC_PTR32 tone;
+    u8 *PC_PTR32 part[2];
     u8 gap;
     u8 part0; // 0x11
     u8 tuneValue; // 0x12
@@ -299,13 +299,13 @@ struct MusicPlayerTrack
     u8 priority;
     u8 pseudoEchoVolume;
     u8 pseudoEchoLength;
-    struct SoundChannel *chan;
+    struct SoundChannel *PC_PTR32 chan;
     struct ToneData tone;
     u8 gap[10];
     u16 unk_3A;
     u32 unk_3C;
-    u8 *cmdPtr;
-    u8 *patternStack[3];
+    u8 *PC_PTR32 cmdPtr;
+    u8 *PC_PTR32 patternStack[3];
 };
 
 #define MUSICPLAYER_STATUS_TRACK 0x0000ffff
@@ -345,15 +345,15 @@ struct MusicPlayerInfo
 
 struct MusicPlayer
 {
-    struct MusicPlayerInfo *info;
-    struct MusicPlayerTrack *track;
+    struct MusicPlayerInfo *PC_PTR32 info;
+    struct MusicPlayerTrack *PC_PTR32 track;
     u8 unk_8;
     u16 unk_A;
 };
 
 struct Song
 {
-    struct SongHeader *header;
+    struct SongHeader *PC_PTR32 header;
     u16 ms;
     u16 me;
 };

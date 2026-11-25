@@ -261,7 +261,11 @@ const struct PokemonCrySong gPokemonCrySongTemplate =
     0, // block count
     255, // priority
     0, // reverb
+#ifdef PLATFORM_PC
+    NULL, // &voicegroup000: set by m4aSoundInit (m4a.c) after copying the template
+#else
     (struct ToneData *)&voicegroup000,
+#endif
     NULL,
     NULL,
     0,

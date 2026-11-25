@@ -13,6 +13,59 @@
 	.4byte gMapName_\name
 	.endm
 
+#ifdef PLATFORM_PC
+@ 64-bit host: the C structs these tables are read as (sprite.h) hold
+@ 8-byte pointers, so the pointer fields widen and the structs grow to a
+@ multiple of 8 bytes.
+	.macro obj_tiles address, uncompressed_size, tag
+	.8byte \address
+	.2byte \uncompressed_size
+	.2byte \tag
+	.long 0 @ padding (.long: not widened by pp_s.py --wide)
+	.endm
+
+	.macro null_obj_tiles
+	obj_tiles 0, 0, 0
+	.endm
+
+	.macro obj_pal address, tag
+	.8byte \address
+	.2byte \tag
+	.2byte 0 @ padding
+	.long 0 @ padding (.long: not widened by pp_s.py --wide)
+	.endm
+
+	.macro null_obj_pal
+	obj_pal 0, 0
+	.endm
+
+	.macro paired_pals tag, address
+	.2byte \tag
+	.2byte 0 @ padding
+	.long 0 @ padding (.long: not widened by pp_s.py --wide)
+	.8byte \address
+	.endm
+
+@ For object animation frames.
+	.macro obj_frame_tiles address, uncompressed_size
+	.8byte \address
+	.2byte \uncompressed_size
+	.2byte 0 @ padding
+	.long 0 @ padding (.long: not widened by pp_s.py --wide)
+	.endm
+
+	.macro spr_template tile_tag, pal_tag, oam, anims, images, affine_anims, callback
+	.2byte \tile_tag
+	.2byte \pal_tag
+	.long 0 @ padding (.long: not widened by pp_s.py --wide)
+	.8byte \oam
+	.8byte \anims
+	.8byte \images
+	.8byte \affine_anims
+	.8byte \callback
+	.endm
+
+#else
 	.macro obj_tiles address, uncompressed_size, tag
 	.4byte \address
 	.2byte \uncompressed_size
@@ -55,6 +108,8 @@
 	.4byte \affine_anims
 	.4byte \callback
 	.endm
+
+#endif
 
 @ Berry trees have a table defining the palette slot used for each of their 5
 @ stages. However, the first 2 stages always use the same slots regardless of

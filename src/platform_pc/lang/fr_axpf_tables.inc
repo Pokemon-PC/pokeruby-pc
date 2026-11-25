@@ -1,0 +1,10 @@
+    /* Pokemon - Version Saphir (France) rev 1 (AXPF): scripts/lang/find_fr_tables.py */
+    NAMES(gSpeciesNames, 0x1FF504, 412),
+    NAMES(gMoveNames, 0x2006B8, 355),
+    NAMES(gAbilityNames, 0x202624, 78),
+    NAMES(gTypeNames, 0x201C08, 18),
+    NAMES(gTrainerClassNames, 0x1F85A0, 58),
+    TABLE(gItems, name, 0x3CCAF4, 44, 0, 349),
+    TABLE(gTrainers, trainerName, 0x1F8894, 40, 4, 694),
+    TABLE(gBerries, name, 0x3D48F4, 28, 0, 43),
+    TABLE(gPokedexEntries, categoryName, 0x3B8D6C, 36, 0, 387),

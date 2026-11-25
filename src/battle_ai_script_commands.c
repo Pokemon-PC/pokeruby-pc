@@ -32,7 +32,7 @@ extern u16 gSideStatuses[2];
 extern struct BattlePokemon gBattleMons[MAX_BATTLERS_COUNT];
 extern u8 gCritMultiplier;
 extern u16 gTrainerBattleOpponent;
-extern u8 *BattleAIs[];
+extern u8 *PC_PTR32 BattleAIs[];
 
 enum
 {

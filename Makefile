@@ -120,7 +120,8 @@ MID_BUILDDIR := $(BUILD_DIR)/$(MID_SUBDIR)
 MID_SRCS := $(wildcard $(MID_SUBDIR)/*.mid)
 MID_OBJS := $(patsubst $(MID_SUBDIR)/%.mid,$(MID_BUILDDIR)/%.o,$(MID_SRCS))
 
-C_SOURCES    := $(wildcard src/*.c src/*/*.c src/*/*/*.c)
+# The PC port (src/platform_pc, built by CMake) is not part of the ROM.
+C_SOURCES    := $(filter-out src/platform_pc/%,$(wildcard src/*.c src/*/*.c src/*/*/*.c))
 ASM_SOURCES  := $(wildcard src/*.s src/*/*.s asm/*.s data/*.s sound/*.s sound/*/*.s)
 
 C_OBJECTS    := $(addprefix $(BUILD_DIR)/, $(C_SOURCES:%.c=%.o))

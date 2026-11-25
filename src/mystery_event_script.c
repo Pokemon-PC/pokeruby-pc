@@ -18,8 +18,8 @@
 #include "constants/berry.h"
 #include "constants/species.h"
 
-extern ScrCmdFunc gMysteryEventScriptCmdTable[];
-extern ScrCmdFunc gMysteryEventScriptCmdTableEnd[];
+extern ScrCmdFunc PC_PTR32 gMysteryEventScriptCmdTable[];
+extern ScrCmdFunc PC_PTR32 gMysteryEventScriptCmdTableEnd[];
 
 // 0x1 in English FRLG, 0x1 in English Emerald
 #if ENGLISH

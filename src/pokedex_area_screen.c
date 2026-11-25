@@ -18,6 +18,9 @@
 #include "overworld.h"
 #include "event_data.h"
 #include "trig.h"
+#ifdef PLATFORM_PC
+#undef errno // the C library's errno macro; a field below has that name
+#endif
 #include "graphics.h"
 
 // Static type declarations

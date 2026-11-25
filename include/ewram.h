@@ -40,8 +40,17 @@ extern u8 gSharedMem[];
 #define AI_STACK                          ((struct AI_Stack *)         (gSharedMem + 0x16C00))
 #define eSecretBaseRecord                 ((struct SecretBaseRecord *)(gSharedMem + 0x17000))
 #define eBattleFlagsArr                   (*(struct ResourceFlags *)(gSharedMem + 0x17100))
+#ifdef PLATFORM_PC
+// Stacks of 8 pointers: 0x48 bytes on a 64-bit host, more than the 0x30 and
+// 0x40 bytes the GBA leaves them here (they would overwrite each other). The
+// PC's EWRAM is larger than the GBA's: they go past the end of gSharedMem
+// (src/platform_pc/scripts/find_ewram_overlaps.py).
+#define B_BATTLESCRIPTS_STACK             ((struct BattleScriptsStack *)     (gSharedMem + 0x20000))
+#define B_FUNCTION_STACK                  ((struct BattleCallbacksStack *)        (gSharedMem + 0x20080))
+#else
 #define B_BATTLESCRIPTS_STACK             ((struct BattleScriptsStack *)     (gSharedMem + 0x17110))
 #define B_FUNCTION_STACK                  ((struct BattleCallbacksStack *)        (gSharedMem + 0x17140))
+#endif
 #define gBattleResources_statsBeforeLvlUp ((struct StatsArray *)(gSharedMem + 0x17180))
 #define gBattleSpriteInfo                 ((struct BattleSpriteInfo *)    (gSharedMem + 0x17800))
 #define gBattleHealthBoxInfo              ((struct BattleHealthboxInfo *)    (gSharedMem + 0x17810))

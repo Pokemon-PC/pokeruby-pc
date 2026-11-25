@@ -81,8 +81,8 @@ extern u8 TradeRoom_PromptToCancelLink[];
 extern u8 TradeRoom_TerminateLink[];
 extern u8 gUnknown_081A4508[];
 
-extern struct MapLayout * const gMapLayouts[];
-extern struct MapHeader * const * const gMapGroups[];
+extern struct MapLayout * const PC_PTR32 gMapLayouts[];
+extern struct MapHeader * const PC_PTR32 * const PC_PTR32 gMapGroups[];
 extern s32 gMaxFlashLevel;
 
 u16 word_3004858;

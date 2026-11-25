@@ -3107,6 +3107,91 @@ static void sub_80A12D0(s8 a)
 //         DestroyTask(taskId);
 //     }
 // }
+#ifdef PLATFORM_PC
+// C versions of the two NAKED tasks below (the decomp only has them in ARM
+// assembly), translated instruction by instruction. They scroll the move
+// description box under the Pokemon's picture in or out.
+//
+// The ARM code of sub_80A1500 finds its task data at gTasks + 8 + 48 * taskId
+// instead of gTasks + 8 + 40 * taskId (sizeof(struct Task) is 40 on the GBA):
+// on the GBA it works on whatever lies at that address. The same GBA address is
+// mapped here onto the host's struct Task.
+static s16 *PssTaskData_GbaOffset(u32 gbaOffset)
+{
+    u32 task = gbaOffset / 40;
+    u32 offset = gbaOffset % 40;
+
+    if (offset < 8)
+        return gTasks[task].data; // header bytes on the GBA: not reproducible on PC
+    return (s16 *)((u8 *)gTasks[task].data + (offset - 8));
+}
+
+static void PssScrollMoveBox(u8 taskId, s16 *data, u8 *vram, const u8 *gfx, u8 page)
+{
+    s16 n;
+    u8 i;
+    u8 *dest;
+
+    data[1] += data[0];
+    n = 0;
+    if (data[1] >= 0)
+    {
+        n = 10;
+        if (data[1] <= 10)
+            n = data[1];
+    }
+
+    if (n > 0)
+    {
+        dest = vram + (10 - n) * 2;
+        for (i = 0; i < 7; i++)
+        {
+            CpuSet(gfx + (i + 13) * 64, dest, n & 0x1FFFFF);
+            dest += 64;
+        }
+    }
+
+    if (n <= 9)
+    {
+        dest = vram;
+        for (i = 0; i < 7; i++)
+        {
+            u16 fill = data[2];
+            CpuSet(&fill, dest, ((10 - n) & 0x1FFFFF) | CPU_SET_SRC_FIXED);
+            dest += 64;
+        }
+    }
+    else
+    {
+        Menu_EraseWindowRect(0, 19, 9, 19);
+    }
+
+    if (data[0] == 0 || data[1] < 0)
+    {
+        if (pssData.page == page)
+        {
+            Menu_EraseWindowRect(0, 14, 9, 18);
+            sub_80A0958(&pssData.loadedMon);
+            if (GetMonStatusAndPokerus(&pssData.loadedMon))
+                SummaryScreen_PrintColoredText(gOtherText_Status, 13, 1, 18);
+        }
+        DestroyTask(taskId);
+    }
+
+    if (data[1] > 9)
+    {
+        if (pssData.page == page)
+            sub_80A00F4(data[3]);
+        sub_80A0428(&pssData.loadedMon, (u8 *)&data[3]);
+        DestroyTask(taskId);
+    }
+}
+
+static void sub_80A1334(u8 taskId)
+{
+    PssScrollMoveBox(taskId, gTasks[taskId].data, (u8 *)(VRAM + 0x5B40), gUnknown_08E73E88, PSS_PAGE_BATTLE_MOVES);
+}
+#else
 NAKED
 static void sub_80A1334(u8 taskId)
 {
@@ -3278,6 +3363,7 @@ _080A1480: .4byte gSharedMem + 0x18000\n\
 _080A1484: .4byte gOtherText_Status\n\
     .syntax divided\n");
 }
+#endif
 
 // Related to re-drawing the summary area underneath the pokemon's picture
 // in all of the summary screen tabs.
@@ -3303,6 +3389,13 @@ static void sub_80A1488(s8 a, u8 b)
     gTasks[taskId].data[3] = b;
 }
 
+#ifdef PLATFORM_PC
+static void sub_80A1500(u8 taskId)
+{
+    PssScrollMoveBox(taskId, PssTaskData_GbaOffset(48 * taskId + 8), (u8 *)(VRAM + 0x6B40),
+                     gUnknown_08E74688, PSS_PAGE_CONTEST_MOVES);
+}
+#else
 NAKED
 static void sub_80A1500(u8 taskId)
 {
@@ -3474,6 +3567,7 @@ _080A164C: .4byte gSharedMem + 0x18000\n\
 _080A1650: .4byte gOtherText_Status\n\
     .syntax divided\n");
 }
+#endif
 
 static void sub_80A1654(s8 a, u8 b)
 {

@@ -108,7 +108,7 @@ struct AffineAnimEndCmdAlt
     u16 val;
 };
 
-union AffineAnimCmd
+union PC_APCS AffineAnimCmd
 {
     s16 type;
     struct AffineAnimFrameCmd frame;

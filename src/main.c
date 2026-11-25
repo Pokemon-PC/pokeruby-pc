@@ -64,7 +64,9 @@ bool8 gLinkVSyncDisabled;
 u32 IntrMain_Buffer[0x200];
 s8 gPcmDmaCounter;
 
+#ifndef PLATFORM_PC
 EWRAM_DATA u8 gSharedMem[0x20000] = {0};
+#endif // On PC gSharedMem is the real EWRAM (0x02000000), placed by the linker (--defsym).
 EWRAM_DATA void (**gFlashTimerIntrFunc)(void) = NULL;
 
 static void UpdateLinkAndCallCallbacks(void);
@@ -268,9 +270,15 @@ static void InitIntrHandlers(void)
     for (i = 0; i < INTR_COUNT; i++)
         gIntrTable[i] = gIntrTableTemplate[i];
 
+#ifdef PLATFORM_PC
+    // No ARM code to copy: the HAL dispatches IRQs through gIntrTable in
+    // IntrMain's priority order.
+    pc_irq_set_table(gIntrTable, INTR_COUNT);
+#else
     DmaCopy32(3, IntrMain, IntrMain_Buffer, sizeof(IntrMain_Buffer));
 
     INTR_VECTOR = IntrMain_Buffer;
+#endif
 
     SetVBlankCallback(NULL);
     SetHBlankCallback(NULL);

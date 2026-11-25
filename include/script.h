@@ -14,8 +14,8 @@ struct ScriptContext
     bool8 (*nativePtr)(void);
     const u8 *scriptPtr;
     const u8 *stack[20];
-    ScrCmdFunc *cmdTable;
-    ScrCmdFunc *cmdTableEnd;
+    ScrCmdFunc PC_PTR32 *cmdTable;
+    ScrCmdFunc PC_PTR32 *cmdTableEnd;
     u32 data[4];
 };
 

@@ -1318,7 +1318,7 @@ extern struct MusicPlayerInfo gMPlayInfo_SE1;
 extern struct MusicPlayerInfo gMPlayInfo_SE2;
 
 extern const u16 gSingingMoves[];
-extern const u8 *const gBattleAnims_Moves[];
+extern const u8 *const PC_PTR32 gBattleAnims_Moves[];
 
 static void RunAnimScriptCommand(void);
 static void ScriptCmd_loadspritegfx(void);
@@ -1469,7 +1469,7 @@ void DoMoveAnim(u16 move)
     LaunchBattleAnimation(gBattleAnims_Moves, move, TRUE);
 }
 
-void LaunchBattleAnimation(const u8 *const moveAnims[], u16 move, u8 isMoveAnim)
+void LaunchBattleAnimation(const u8 *const PC_PTR32 moveAnims[], u16 move, u8 isMoveAnim)
 {
     s32 i;
 
