@@ -8,9 +8,10 @@ a window, fast, with scripted keys (PRS_INPUT) and captures (PRS_SHOT).
                                              -> house -> wild battle
   smoke_test.py --save GAME_EXE WORK_DIR     new game -> save; then Continue,
                                              party, summary (3 pages)
-  smoke_test.py --french GAME_EXE WORK_DIR ROM   new game and a battle in French,
-                                             text from the player's French ROM
-                                             (never part of the repository)
+  smoke_test.py --french GAME_EXE WORK_DIR ROM_DIR   new game and a battle in
+                                             French, text from the player's French
+                                             ROM, found in ROM_DIR (rom_dir) by its
+                                             header (never part of the repository)
 
 Frame numbers are those of pokeruby / pokesapphire (US English); the save
 file is save_ruby.bin or save_sapphire.bin after the executable's name.
@@ -47,6 +48,9 @@ def colors(path):
 def run_game(exe, work, env_extra, timeout=1500):
     env = dict(os.environ, PRS_HEADLESS="1", PRS_FAST="1", PRS_HANG_EXIT="1", PRS_TRACE="1", **env_extra)
     env.setdefault("PRS_MUTE", "1")
+    # The scripted keys are timed on the English text: unless a test asks for
+    # French, English even if config.ini (rom_dir) would find the French ROM.
+    env.setdefault("PRS_LANG", "en")
     r = subprocess.run([exe], cwd=work, env=env, capture_output=True, text=True, timeout=timeout)
     return r.returncode, r.stdout + r.stderr
 
@@ -170,19 +174,21 @@ def main_save(exe, work):
     return report(errors, log, "save/continue/menus test passed")
 
 
-def main_french(exe, work, rom):
+def main_french(exe, work, rom_dir):
     errors = []
     rc, log = run_game(exe, work, dict(
-        PRS_LANG="fr", PRS_ROM=rom, PRS_EXIT_AFTER="13500", PRS_TEST="battle@11150",
+        PRS_LANG="fr", PRS_ROM_DIR=rom_dir, PRS_EXIT_AFTER="13500", PRS_TEST="battle@11150",
         PRS_INPUT=TO_HOUSE + ",11400-13400/45:A",
         PRS_SHOT="3900:menu_fr.bmp,4400:birch_fr.bmp,9700:town_fr.bmp,11900:battle_fr.bmp,"
                  "12500:battle2_fr.bmp"))
     if rc != 0 or "[prs:crash]" in log or "[prs:hang]" in log:
         errors.append(f"exit {rc}, crash/hang")
     import re
-    m = re.search(r"lang: French from .* \((\d+) strings", log)
-    if not m or int(m.group(1)) < 4000:
-        errors.append("French text not loaded" if not m else f"only {m.group(1)} French strings")
+    m = re.search(r"lang: French from (.*) \((\d+) strings", log)
+    if not m or int(m.group(2)) < 4000:
+        errors.append("French text not loaded" if not m else f"only {m.group(2)} French strings")
+    elif os.path.normcase(os.path.dirname(os.path.abspath(m.group(1)))) != os.path.normcase(os.path.abspath(rom_dir)):
+        errors.append(f"French ROM not taken from rom_dir: {m.group(1)}")
     names = re.findall(r"lang: (\w+): (\d+)/(\d+) French names", log)
     if len(names) < 8 or any(int(a) < int(b) * 0.9 for _, a, b in names):
         errors.append(f"French name tables: {names}")
@@ -197,7 +203,7 @@ def main_french(exe, work, rom):
     en, fr = (os.path.join(work, n + ".bmp") for n in ("menu_en", "menu_fr"))
     if os.path.exists(en) and os.path.exists(fr) and frame_bytes(en) == frame_bytes(fr):
         errors.append("French and English frames are identical")
-    return report(errors, log, f"French test passed ({m.group(1) if m else '?'} strings)")
+    return report(errors, log, f"French test passed ({m.group(2) if m else '?'} strings, {m.group(1) if m else ''})")
 
 
 def main():

@@ -34,3 +34,5 @@ data-de/event_scripts.s linguist-vendored
 data-de/field_move_scripts.s linguist-vendored
 # sound data
 sound/songs/*.s linguist-vendored
+# Shell scripts run under Linux / WSL: LF line endings in every checkout.
+*.sh text eol=lf

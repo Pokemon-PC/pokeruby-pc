@@ -113,7 +113,7 @@ def main():
     bad = []
     for rel in changed:
         if rel.startswith("src/platform_pc/") or rel.startswith("cmake/") or rel in (
-                "CMakeLists.txt", ".gitignore", "PORTING_ROADMAP.md", "README_PC.md") or rel.startswith(("docs/", ".github/")):
+                "CMakeLists.txt", ".gitignore", ".gitattributes", "PORTING_ROADMAP.md", "README_PC.md") or rel.startswith(("docs/", ".github/")):
             continue
         try:
             cur = open(rel, encoding="utf-8", errors="replace").read()

@@ -44,8 +44,9 @@ cmake --build build-sapphire
 
 Tests : `cd build-pc && ctest` (couche matériel ; démarrage avec son ; monde et
 combat ; sauvegarde, reprise, équipe et résumé). Avec
-`-DPRS_FR_ROM=chemin/de/votre/rom_francaise.gba` à la configuration, le test
-`game_french` joue aussi une nouvelle partie et un combat en français.
+`-DPRS_ROM_DIR=chemin/du/dossier/des/roms` à la configuration, le test
+`game_french` joue aussi une nouvelle partie et un combat en français (la ROM
+est cherchée dans ce dossier, comme avec `rom_dir`).
 
 ## Jouer
 
@@ -79,12 +80,18 @@ Choix, du plus prioritaire au moins prioritaire :
 
 | Quoi | Comment |
 |---|---|
-| Ligne de commande | `pokeruby.exe --lang fr --rom "chemin/rom.gba"` (`--lang en\|fr\|auto`) |
-| Environnement | `PRS_LANG=en\|fr\|auto`, `PRS_ROM=chemin` |
-| `config.ini` | `[game] language = auto\|en\|fr`, `rom = chemin` |
+| Ligne de commande | `pokeruby.exe --lang fr --rom-dir "D:\Jeux\roms"` (`--lang en\|fr\|auto`, `--rom FICHIER`, `--rom-dir DOSSIER`) |
+| Environnement | `PRS_LANG=en\|fr\|auto`, `PRS_ROM=fichier`, `PRS_ROM_DIR=dossier` |
+| `config.ini` | `[game] language = auto\|en\|fr`, `rom = fichier`, `rom_dir = dossier` |
 
-`auto` (défaut) : français si la ROM française est trouvée (chemin donné, sinon
-un `*.gba` à côté de l'exe ou dans le dossier courant), anglais sinon. Le
+**`rom_dir`** : le dossier commun où sont rangées vos ROM (le launcher le
+règle ; vide par défaut). Ordre de recherche de la ROM française : le chemin
+donné par `rom` s'il y en a un, puis le dossier de l'exe, puis `rom_dir`, puis
+le dossier courant. Dans un dossier, la bonne ROM est reconnue **à son en-tête
+et à sa somme de contrôle** (code `AXVF` pour Rubis, `AXPF` pour Saphir, rév. 1),
+jamais à son nom : le dossier peut contenir toutes vos autres ROM.
+
+`auto` (défaut) : français si la ROM française est trouvée, anglais sinon. Le
 journal (sortie standard) indique ce qui a été appliqué : `lang: French from …`
 ou `lang: English`.
 

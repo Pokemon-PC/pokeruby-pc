@@ -253,20 +253,24 @@ static void run_game(void *arg) {
     pc_warn("AgbMain returned");
 }
 
-/* Command line (for a launcher): --lang en|fr|auto, --rom PATH (the
- * player's French ROM). Same as PRS_LANG / PRS_ROM, which they set. */
+/* Command line (for a launcher): --lang en|fr|auto, --rom PATH, --rom-dir DIR (the
+ * player's French ROM, or the folder of the ROMs). Same as PRS_LANG / PRS_ROM /
+ * PRS_ROM_DIR, which they set. */
 static void parse_args(int argc, char **argv) {
     for (int i = 1; i < argc; i++) {
         const char *name = NULL, *value = NULL;
         if (strncmp(argv[i], "--lang", 6) == 0) {
             name = "PRS_LANG";
             value = argv[i][6] == '=' ? argv[i] + 7 : (argv[i][6] == '\0' && i + 1 < argc ? argv[++i] : NULL);
+        } else if (strncmp(argv[i], "--rom-dir", 9) == 0) {
+            name = "PRS_ROM_DIR";
+            value = argv[i][9] == '=' ? argv[i] + 10 : (argv[i][9] == '\0' && i + 1 < argc ? argv[++i] : NULL);
         } else if (strncmp(argv[i], "--rom", 5) == 0) {
             name = "PRS_ROM";
             value = argv[i][5] == '=' ? argv[i] + 6 : (argv[i][5] == '\0' && i + 1 < argc ? argv[++i] : NULL);
         }
         if (name == NULL || value == NULL) {
-            pc_warn("unknown argument '%s' (known: --lang en|fr|auto, --rom PATH)", argv[i]);
+            pc_warn("unknown argument '%s' (known: --lang en|fr|auto, --rom PATH, --rom-dir DIR)", argv[i]);
             continue;
         }
 #if defined(_WIN32)

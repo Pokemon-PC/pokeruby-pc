@@ -131,6 +131,26 @@ Méthode : celle du port Émeraude (`pokeemerald-master`), dont la couche PC
   - Docs : `README_PC.md`, `docs/LAUNCHER.md` (langue/version pilotées par le
     launcher : `--lang`, `--rom`, `PRS_LANG`, `PRS_ROM`, `config.ini`).
 
+- **2026-11-25 (soir)** — Dossier commun des ROM (`rom_dir`).
+  - Les ROM de l'utilisateur sont désormais dans `D:\LUC\pokemonall\roms\` (à
+    plat). Rubis et Saphir FR y ont été **copiés** depuis
+    `D:\LUC\émulateur\VBA\Pokemon PC\Pokemon Rubis|Saphir\` (originaux gardés ;
+    SHA-1 identiques) sous les noms `Pokemon - Version Rubis (France) (Rev 1).gba`
+    et `… Saphir (France) (Rev 1).gba`.
+  - `lang_pc.c` : `rom` → dossier de l'exe → `rom_dir` → dossier courant ; dans un
+    dossier, la ROM est choisie par en-tête **et** CRC (une autre révision est
+    sautée). `config.ini` : `rom_dir =` (vide, commenté) ; `--rom-dir`, `PRS_ROM_DIR`.
+  - Tests : `-DPRS_ROM_DIR=` remplace `-DPRS_FR_ROM=` ; `game_french` vérifie que
+    la ROM vient bien de ce dossier. `build_linux.sh [ROM_DIR]` (défaut
+    `/mnt/d/LUC/pokemonall/roms`) écrit `rom_dir` dans le `config.ini` de chaque build.
+    Configs locales : `build-pc`, `build-sapphire` → `rom_dir = D:\LUC\pokemonall\roms` ;
+    Linux : `~/pokeruby-linux/{ruby,sapphire}/config.ini` → `rom_dir = /mnt/d/LUC/pokemonall/roms`.
+  - Piège : avec `rom_dir` réglé, `language = auto` passe en français ; les tests
+    anglais (touches calées sur le texte anglais) forcent `PRS_LANG=en`.
+  - Vérifié : Windows 5/5 et Linux 5/5, Rubis et Saphir ; chaque exe lancé sans
+    variable d'environnement trouve sa ROM FR dans le dossier commun par son seul `config.ini`.
+  - `.gitattributes` : `*.sh` en LF (sinon `sh` refuse le script sous Linux).
+
 ## Reste à faire / limites connues
 
 - Écoute du son, ressenti de la fluidité, manette réelle : à confirmer par l'utilisateur.

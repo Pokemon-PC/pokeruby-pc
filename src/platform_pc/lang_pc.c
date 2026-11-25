@@ -12,8 +12,11 @@
  * French strings are copied over the English ones before the game starts.
  *
  * config.ini [game] language = auto | en | fr   (auto: French if the ROM is
- * found), [game] rom = path of the French ROM (default: a *.gba next to the
- * executable or in the working folder). PRS_LANG / PRS_ROM override them.
+ * found). The ROM: [game] rom = its path, if given; else the *.gba files of
+ * the executable's folder, then of [game] rom_dir (a common ROM folder),
+ * then of the working folder - chosen by header and checksum, not by name.
+ * PRS_LANG / PRS_ROM / PRS_ROM_DIR (or --lang / --rom / --rom-dir) override
+ * the config.
  */
 #include "pc_hal.h"
 #include "platform_pc.h"
@@ -113,7 +116,19 @@ static uint8_t *load_if_french(const char *path) {
     return rom;
 }
 
-/* First French ROM among the *.gba files of dir. */
+/* In a folder of many ROMs (rom_dir): the right one is chosen by its header
+ * (game code) and its checksum, never by its file name; another revision of
+ * the same game is skipped, the search goes on. */
+static uint8_t *load_if_expected(const char *path) {
+    uint8_t *rom = load_if_french(path);
+    if (rom != NULL && crc32_of(rom, FR_ROM_SIZE) != FR_ROM_CRC32) {
+        free(rom);
+        rom = NULL;
+    }
+    return rom;
+}
+
+/* First French ROM of this game among the *.gba files of dir. */
 static uint8_t *find_in_dir(const char *dir, char *found, size_t n) {
 #if defined(_WIN32)
     char pattern[1100];
@@ -126,7 +141,7 @@ static uint8_t *find_in_dir(const char *dir, char *found, size_t n) {
     uint8_t *rom = NULL;
     do {
         snprintf(found, n, "%s\\%s", dir, fd.cFileName);
-        rom = load_if_french(found);
+        rom = load_if_expected(found);
     } while (rom == NULL && FindNextFileA(h, &fd));
     FindClose(h);
     return rom;
@@ -141,7 +156,7 @@ static uint8_t *find_in_dir(const char *dir, char *found, size_t n) {
         size_t l = strlen(e->d_name);
         if (l > 4 && (strcmp(e->d_name + l - 4, ".gba") == 0 || strcmp(e->d_name + l - 4, ".GBA") == 0)) {
             snprintf(found, n, "%s/%s", dir, e->d_name);
-            rom = load_if_french(found);
+            rom = load_if_expected(found);
         }
     }
     closedir(d);
@@ -158,6 +173,8 @@ static uint8_t *find_french_rom(char *path, size_t n) {
         snprintf(path, n, "%s", forced);
         return load_if_french(path);
     }
+    /* Search order: explicit path (above), the executable's folder, the
+     * common ROM folder (rom_dir), the working folder. */
     uint8_t *rom = NULL;
     char *base = SDL_GetBasePath();
     if (base != NULL) {
@@ -167,6 +184,21 @@ static uint8_t *find_french_rom(char *path, size_t n) {
         }
         rom = find_in_dir(base, path, n);
         SDL_free(base);
+    }
+    if (rom == NULL) {
+        const char *dir = getenv("PRS_ROM_DIR");
+        if (dir == NULL || *dir == '\0') {
+            dir = pc_config_get("game", "rom_dir", NULL);
+        }
+        if (dir != NULL && *dir != '\0') {
+            char d[1024];
+            snprintf(d, sizeof d, "%s", dir);
+            size_t l = strlen(d);
+            while (l > 1 && (d[l - 1] == '/' || d[l - 1] == '\\')) {
+                d[--l] = '\0';
+            }
+            rom = find_in_dir(d, path, n);
+        }
     }
     if (rom == NULL) {
         rom = find_in_dir(".", path, n);
@@ -213,8 +245,9 @@ void pc_lang_apply(void) {
     uint8_t *rom = find_french_rom(path, sizeof path);
     if (rom == NULL) {
         if (SDL_strcasecmp(want, "fr") == 0) {
-            pc_log("lang: French asked, but no " FR_ROM_NAME " ROM (" FR_ROM_CODE ") found next to the game:"
-                   " English. Put your own ROM (*.gba) next to the executable, or set [game] rom.");
+            pc_log("lang: French asked, but no " FR_ROM_NAME " ROM (" FR_ROM_CODE ") found next to the game"
+                   " or in rom_dir: English. Put your own ROM (*.gba) next to the executable, or set"
+                   " [game] rom_dir (or rom) in config.ini.");
         } else {
             pc_log("lang: English (no French ROM found)");
         }

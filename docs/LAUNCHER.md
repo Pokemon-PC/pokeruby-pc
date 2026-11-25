@@ -11,9 +11,14 @@ launcher pilote.
 |---|---|---|
 | Version | lancer `pokeruby.exe` (Rubis) ou `pokesapphire.exe` (Saphir) | un exe par jeu ; ils peuvent partager un dossier |
 | Langue | `--lang en\|fr\|auto` | ou `PRS_LANG=…`, ou `config.ini [game] language = …` (dans cet ordre de priorité) |
-| ROM française | `--rom CHEMIN` | ou `PRS_ROM=…`, ou `[game] rom = …` ; sinon un `*.gba` à côté de l'exe ou dans le dossier courant |
+| Dossier des ROM | `--rom-dir DOSSIER` | ou `PRS_ROM_DIR=…`, ou `[game] rom_dir = …` (vide par défaut) : le dossier commun des ROM |
+| ROM française (fichier précis) | `--rom CHEMIN` | ou `PRS_ROM=…`, ou `[game] rom = …` |
 | Sauvegarde | `PRS_SAVE=fichier` | défaut `save_ruby.bin` / `save_sapphire.bin` ; même sauvegarde pour les deux langues |
 | Fenêtre | `[video] scale`, `fullscreen` | |
+
+Ordre de recherche de la ROM française : `rom` (fichier précis) → dossier de
+l'exe → `rom_dir` → dossier courant. Dans un dossier, la ROM est reconnue à son
+en-tête (`AXVF` / `AXPF`) et à sa somme de contrôle, pas à son nom.
 
 `auto` = français si la ROM française **du même jeu** est trouvée, anglais sinon.
 

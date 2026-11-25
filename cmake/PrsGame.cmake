@@ -280,11 +280,12 @@ target_compile_definitions(prs_game_flags INTERFACE
     ENGLISH=1 REVISION=0 DEBUG=0 DEBUG_FIX=0)
 
 # French: only with the player's own French ROM of this game (never part of
-# the repository): cmake -DPRS_FR_ROM="path/to/Pokemon - Version Rubis (F).gba"
-set(PRS_FR_ROM "" CACHE FILEPATH "Your French ROM of this game, for the game_french test")
-if(PRS_FR_ROM)
+# the repository), found in the common ROM folder by its header:
+#   cmake -DPRS_ROM_DIR="D:/path/to/roms"        (the config.ini rom_dir)
+set(PRS_ROM_DIR "" CACHE PATH "Folder of your ROMs (rom_dir), for the game_french test")
+if(PRS_ROM_DIR)
     add_test(NAME game_french
              COMMAND ${Python3_EXECUTABLE} ${PRS_ROOT}/src/platform_pc/scripts/smoke_test.py --french
-                     $<TARGET_FILE:prs_game_exe> ${CMAKE_CURRENT_BINARY_DIR}/frenchtest ${PRS_FR_ROM})
+                     $<TARGET_FILE:prs_game_exe> ${CMAKE_CURRENT_BINARY_DIR}/frenchtest ${PRS_ROM_DIR})
     set_tests_properties(game_french PROPERTIES TIMEOUT 1500)
 endif()
